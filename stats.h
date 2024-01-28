@@ -1,5 +1,8 @@
 #pragma once
 
+const double pi = 3.1415926535897932;
+
+
 class stats1D {
 public:
 	stats1D();
@@ -34,4 +37,14 @@ private:
 	double m_sum_y;
 	double m_sumsquared_y;
 	double m_sum_xy;
+};
+
+class NormalRandomGenerator {
+public:
+	NormalRandomGenerator();
+	double generate();
+private:
+	double m_U1;
+	double m_U2;
+	double boxMuller();
 };

@@ -44,6 +44,7 @@ void stats2D::add(double x, double y)
 	m_sumsquared_x += x * x;
 	m_sum_y += y;
 	m_sumsquared_y += y * y;
+	m_sum_xy += x * y;
 }
 double stats2D::meanX()
 {
@@ -100,8 +101,11 @@ double stats2D::cov()
 }
 double stats2D::corr()
 {
-	if (varX() != 0 && varY() != 0) {
+	if (varX() != 0 && varY() != 0 && m_size >= 2) {
 		return cov() / (std::sqrt(varX() * varY()));
+	}
+	else if (varX() != 0 && varY() != 0 && m_size < 2) {
+		throw std::runtime_error("Error in stats2D::corr(). Too few data points, correlation requires at least 2.");
 	}
 	else {
 		throw std::runtime_error("Error in stats2D::corr(). Attempted division by zero.");
@@ -118,5 +122,26 @@ double stats2D::lineargradient()
 }
 double stats2D::linearintercept()
 {
-	return meanY() - (lineargradient() * meanX());
+	if (varX() != 0) {
+		return meanY() - (lineargradient() * meanX());
+	}
+	else {
+		throw std::runtime_error("Error in stats2D::linearintercept(). No Y-intercept term exists when X has no variability.");
+	}
+}
+
+NormalRandomGenerator::NormalRandomGenerator()
+	:m_U1(double(rand())/double(RAND_MAX)), m_U2(double(rand()) / double(RAND_MAX))
+{}
+
+double NormalRandomGenerator::boxMuller() {
+	double m_U1 = double(rand()) / double(RAND_MAX);
+	double m_U2 = double(rand()) / double(RAND_MAX);
+	double Z1 = std::sqrt(-2 * log(m_U1)) * std::cos(2 * pi * m_U2);
+	//double Z2 = std::sqrt(-2 * log(m_U1)) * std::sin(2 * pi * m_U2);
+	return Z1;
+}
+
+double NormalRandomGenerator::generate() {
+	return boxMuller();
 }
