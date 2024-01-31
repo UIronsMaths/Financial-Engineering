@@ -8,6 +8,7 @@ stats1D::stats1D()
 void stats1D::add(double x)
 {
 	m_size++;
+
 	m_sum += x;
 	m_sumsquared += x * x;
 }
@@ -134,14 +135,22 @@ NormalRandomGenerator::NormalRandomGenerator()
 	:m_U1(double(rand())/double(RAND_MAX)), m_U2(double(rand()) / double(RAND_MAX))
 {}
 
-double NormalRandomGenerator::boxMuller() {
+double NormalRandomGenerator::boxMuller() 
+{
 	double m_U1 = double(rand()) / double(RAND_MAX);
 	double m_U2 = double(rand()) / double(RAND_MAX);
 	double Z1 = std::sqrt(-2 * log(m_U1)) * std::cos(2 * pi * m_U2);
 	//double Z2 = std::sqrt(-2 * log(m_U1)) * std::sin(2 * pi * m_U2);
-	return Z1;
+
+	//
+	// The 21278th standards normal variable generated is generated as Inf. 
+	// While standard normal variables are allowed extreme values, this presents an edge case.
+	// We need to clip the generated values to a reasonable set of values, say [-10,10].
+	//
+	return (Z1 > -10 && Z1 < 10) ? Z1 : 0;
 }
 
-double NormalRandomGenerator::generate() {
+double NormalRandomGenerator::generate() 
+{
 	return boxMuller();
 }

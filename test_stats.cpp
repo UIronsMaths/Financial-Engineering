@@ -4,7 +4,7 @@
 #include<iostream>
 #include<cmath>
 
-void testing::testMean()
+void testing_stats::testMean()
 {
 	//
 	// Basic mean of 1, 2, 3
@@ -81,7 +81,7 @@ void testing::testMean()
         assert(true);
     }
 }
-void testing::testVar()
+void testing_stats::testVar()
 {
     //
     // Basic variance of 1, 2, 3
@@ -136,7 +136,7 @@ void testing::testVar()
     assert(test6.varX() == 0);
     assert(test6.varY() == 0);
 }
-void testing::testStDev()
+void testing_stats::testStDev()
 {
     //
     // Basic standard deviation of 1, 2, 3
@@ -191,7 +191,7 @@ void testing::testStDev()
     assert(test6.stDevX() == 0);
     assert(test6.stDevY() == 0);
 }
-void testing::testCov()
+void testing_stats::testCov()
 {
     //
     // Covariance of 1, 2, 3
@@ -218,7 +218,7 @@ void testing::testCov()
     test3.add(42, 42);
     assert(test3.cov() == 0);
 }
-void testing::testCorr()
+void testing_stats::testCorr()
 {
     //
     // Correlation of 1, 2, 3
@@ -253,7 +253,7 @@ void testing::testCorr()
         assert(true);
     }
 }
-void testing::testLinGrad()
+void testing_stats::testLinGrad()
 {
     //
     // Linear gradient of 1, 2, 3
@@ -299,7 +299,7 @@ void testing::testLinGrad()
         assert(true);
     }
 }
-void testing::testLinInt()
+void testing_stats::testLinInt()
 {
     //
     // Linear intercept of 1, 2, 3
@@ -345,7 +345,7 @@ void testing::testLinInt()
         assert(true);
     }
 }
-void testing::testGen() {
+void testing_stats::testGen() {
     NormalRandomGenerator testG1;
     stats1D testS1;
     for (int i = 0; i < 10000; i++) {
@@ -353,4 +353,25 @@ void testing::testGen() {
     }
     assert(testS1.mean() < 0.01);
     assert(testS1.var() - 1 < 0.01);
+
+    //
+    // The 21278th standards normal variable generated is generated as Inf.
+    //
+    stats1D testS2;
+    NormalRandomGenerator testG2;
+    for (int i = 0; i < 21278; i++) {
+        testS2.add(testG2.generate());
+    }
+    assert(testS1.mean() < 0.01);
+}
+void testing_stats::test_stats() {
+    testMean();
+    testVar();
+    testStDev();
+    testCov();
+    testCorr();
+    testLinGrad();
+    testLinInt();
+    testGen();
+    std::cout << "All testcases passed." << std::endl;
 }

@@ -1,6 +1,9 @@
 #pragma once
 
-class testing {
+class testing_stats {
+public:
+	void test_stats();
+private:
 	void testMean();
 	void testVar();
 	void testStDev();
