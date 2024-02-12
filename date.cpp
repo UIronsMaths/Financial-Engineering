@@ -1,7 +1,3 @@
-#include<iostream>
-#include<vector>
-#include<tuple>
-//#include"basic.h"
 #include"date.h"
 
 date::date(unsigned int day, unsigned int month, unsigned int year)
@@ -114,6 +110,13 @@ void date::addBusinessDays(int days) {
             }
         }
     }
+}
+date date::operator++() {
+    addDays(1);
+    return *this;
+}
+bool date::operator!=(date dt) {
+    return (m_serial != dt.m_serial);
 }
 
 

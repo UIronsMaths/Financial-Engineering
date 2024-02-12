@@ -1,5 +1,7 @@
 #pragma once
-//#include"basic.h"
+#include<iostream>
+#include<vector>
+#include<tuple>
 
 class date {
 	friend class testing_date;
@@ -18,6 +20,9 @@ public:
 	bool isGBD();
 	void rollToGBD();
 	void addBusinessDays(int days);
+
+	date operator++();
+	bool operator!=(date dt);
 
 private:
 	unsigned int m_serial;

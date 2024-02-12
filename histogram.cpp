@@ -1,6 +1,3 @@
-#include<vector>
-#include<fstream>
-#include <iomanip>
 #include"histogram.h"
 
 histogram::histogram(double minval, double maxval, int bins)

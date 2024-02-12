@@ -1,6 +1,4 @@
 #include"stats.h"
-#include<iostream>
-#include<cmath>
 
 stats1D::stats1D()
 	:m_size(0), m_sum(0), m_sumsquared(0)
