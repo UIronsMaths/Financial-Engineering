@@ -3,13 +3,16 @@
 date::date(unsigned int day, unsigned int month, unsigned int year)
 	:m_serial(DMY_to_serial(day, month, year))
 {}
+
 date::date(unsigned int numdays)
 	:m_serial(numdays)
 {}
-int date::getSerial()
+
+int date::getSerial()const  
 {
 	return m_serial;
 }
+
 std::tuple<int, int, int> date::getDMY()
 {
 	unsigned int day;
@@ -18,10 +21,12 @@ std::tuple<int, int, int> date::getDMY()
 	serial_to_DMY(m_serial, day, month, year);
 	return std::make_tuple(day, month, year);
 }
+
 void date::addDays(int days)
 {
 	m_serial += days;
 }
+
 void date::addMonths(int months)
 {
 	unsigned int day;
@@ -51,6 +56,7 @@ void date::addMonths(int months)
 	m_serial = DMY_to_serial(day, month, year);
 
 }
+
 void date::addYears(int years)
 {
 	unsigned int day;
@@ -61,12 +67,12 @@ void date::addYears(int years)
 	year += years;
 	m_serial = DMY_to_serial(day, month, year);
 }
-int date::daysDiff(date dt)
-{
+
+int date::daysDiff(date dt) {
 	return m_serial - dt.getSerial();
 }
-date::Weekday date::weekday()
-{
+
+date::Weekday date::weekday() {
     unsigned int day;
     unsigned int month;
     unsigned int year;
@@ -84,20 +90,29 @@ date::Weekday date::weekday()
     // Adjust the result to match the Weekday enum values
     return static_cast<enum date::Weekday>(((dayOfWeek+5)%7)+1);
 }
+
 bool date::isGBD() {
     date::Weekday day = weekday();
-    if (day == Sunday || day == Saturday) {
-        return false;
-    }
-    else {
-        return true;
-    }
+    return !(day == Sunday || day == Saturday);
 }
+/*
+bool date::isGBD(const calendar& cal) {
+    date::Weekday day = weekday();
+    return !((day == Sunday || day == Saturday) && (!cal.isHoliday(*this)));
+}
+*/
 void date::rollToGBD() {
     while (!isGBD()) {
         m_serial++;
     }
 }
+/*
+void date::rollToGBD(const calendar& cal){
+    while (!isGBD(cal)) {
+        m_serial++;
+    }
+}
+*/
 void date::addBusinessDays(int days) {
     while (days != 0) {
         if (isGBD()) {
@@ -111,20 +126,20 @@ void date::addBusinessDays(int days) {
         }
     }
 }
+
 date date::operator++() {
     addDays(1);
     return *this;
 }
+
 bool date::operator!=(date dt) {
     return (m_serial != dt.m_serial);
 }
 
-
 int date::DMY_to_serial(int day, int month, int year) {
     // Check for valid input
     if (!isValidDate(day, month, year)) {
-        std::cerr << "Invalid date input.\n";
-        return -1;  // or any suitable error code
+        throw std::invalid_argument("Invalid date input.");
     }
 
     // Constants for date calculations
@@ -154,6 +169,7 @@ int date::DMY_to_serial(int day, int month, int year) {
 
     return days;
 }
+
 void date::serial_to_DMY(int m_serial, unsigned int& day, unsigned int& month, unsigned int& year) {
     // Constants for date calculations
     const int daysInYear = 365;
@@ -201,6 +217,7 @@ void date::serial_to_DMY(int m_serial, unsigned int& day, unsigned int& month, u
         }
     }
 }
+
 bool date::isValidDate(int day, int month, int year) {
     // Basic checks for day, month, and year validity
     if (year < 1900 || month < 1 || month > 12 || day < 1 || day > 31) {
@@ -222,10 +239,12 @@ bool date::isValidDate(int day, int month, int year) {
 
     return true;
 }
+
 bool date::isLeapYear(int year) {
     // Check if a year is a leap year
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 }
+
 int date::countLeapYears(int startYear, int endYear) {
     // Count the number of leap years in the range [startYear, endYear]
     int count = 0;
@@ -236,6 +255,7 @@ int date::countLeapYears(int startYear, int endYear) {
     }
     return count;
 }
+
 int date::getDaysInMonth(int year, int month) {
     // Get the number of days in a specific month
     const int daysInMonth[] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };

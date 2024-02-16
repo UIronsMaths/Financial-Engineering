@@ -7,6 +7,7 @@ public:
 	virtual double priceByBSFormula(double spot, double sigma, double r) = 0;
 	virtual double deltaByBSFormula(double spot, double sigma, double r) = 0;
 	virtual double gammaByBSFormula(double spot, double sigma, double r) = 0;
+	virtual double thetaByBSFormula(double spot, double sigma, double r) = 0;
 protected:
 	//
 	// We have inputted data that will be used in this class.
@@ -31,6 +32,7 @@ public:
 	virtual double priceByBSFormula(double spot, double sigma, double r);
 	virtual double deltaByBSFormula(double spot, double sigma, double r);
 	virtual double gammaByBSFormula(double spot, double sigma, double r);
+	virtual double thetaByBSFormula(double spot, double sigma, double r);
 };
 
 class euroPut : public euroOption {
@@ -39,4 +41,5 @@ public:
 	virtual double priceByBSFormula(double spot, double sigma, double r);
 	virtual double deltaByBSFormula(double spot, double sigma, double r);
 	virtual double gammaByBSFormula(double spot, double sigma, double r);
+	virtual double thetaByBSFormula(double spot, double sigma, double r);
 };

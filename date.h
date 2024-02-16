@@ -1,4 +1,5 @@
 #pragma once
+#include"calendar.h"
 #include<iostream>
 #include<vector>
 #include<tuple>
@@ -10,7 +11,7 @@ public:
 
 	date(unsigned int day, unsigned int month, unsigned int year);
 	date(unsigned int numDays);
-	int getSerial();
+	int getSerial() const;
 	std::tuple<int, int, int> getDMY();
 	void addDays(int days);
 	void addMonths(int months);
@@ -18,7 +19,9 @@ public:
 	int daysDiff(date dt);
 	enum Weekday weekday();
 	bool isGBD();
+	//bool isGBD(const calendar& cal);
 	void rollToGBD();
+	//void rollToGBD(const calendar& cal);
 	void addBusinessDays(int days);
 
 	date operator++();

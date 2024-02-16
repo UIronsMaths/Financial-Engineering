@@ -72,3 +72,11 @@ double euroCall::gammaByBSFormula(double spot, double sigma, double r) {
 double euroPut::gammaByBSFormula(double spot, double sigma, double r) {
 	return phi(d_plus(spot, sigma, r)) / (spot * sigma * sqrt(m_expiry));
 }
+
+double euroCall::thetaByBSFormula(double spot, double sigma, double r) {
+	return -(spot * phi(d_plus(spot, sigma, r)) * sigma) / (2 * sqrt(m_expiry)) - (r * m_strike * exp(r * m_expiry) * N(d_minus(spot, sigma, r)));
+}
+
+double euroPut::thetaByBSFormula(double spot, double sigma, double r) {
+	return -(spot * phi(d_plus(spot, sigma, r)) * sigma) / (2 * sqrt(m_expiry)) + (r * m_strike * exp(r * m_expiry) * N(-d_minus(spot, sigma, r)));
+}
