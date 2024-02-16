@@ -95,24 +95,24 @@ bool date::isGBD() {
     date::Weekday day = weekday();
     return !(day == Sunday || day == Saturday);
 }
-/*
+
 bool date::isGBD(const calendar& cal) {
     date::Weekday day = weekday();
     return !((day == Sunday || day == Saturday) && (!cal.isHoliday(*this)));
 }
-*/
+
 void date::rollToGBD() {
     while (!isGBD()) {
         m_serial++;
     }
 }
-/*
+
 void date::rollToGBD(const calendar& cal){
     while (!isGBD(cal)) {
         m_serial++;
     }
 }
-*/
+
 void date::addBusinessDays(int days) {
     while (days != 0) {
         if (isGBD()) {
@@ -120,10 +120,14 @@ void date::addBusinessDays(int days) {
             days--;
         }
         else if (!isGBD()) {
-            while (!isGBD()) {
-                m_serial++;
-            }
+            rollToGBD();
         }
+    }
+    //
+    // Edge case: advance Friday by one business day.
+    //
+    if (!isGBD()) {
+        rollToGBD();
     }
 }
 

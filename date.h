@@ -1,8 +1,14 @@
 #pragma once
-#include"calendar.h"
 #include<iostream>
 #include<vector>
 #include<tuple>
+#include<set>
+#include"calendar.h"
+
+//
+// Forward declaration needed to avoid circular dependancy.
+//
+class calendar;
 
 class date {
 	friend class testing_date;
@@ -19,9 +25,9 @@ public:
 	int daysDiff(date dt);
 	enum Weekday weekday();
 	bool isGBD();
-	//bool isGBD(const calendar& cal);
+	bool isGBD(const calendar& cal);
 	void rollToGBD();
-	//void rollToGBD(const calendar& cal);
+	void rollToGBD(const calendar& cal);
 	void addBusinessDays(int days);
 
 	date operator++();

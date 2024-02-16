@@ -2,6 +2,7 @@
 #include<cmath>
 
 class euroOption {
+	friend class testing_euroOption;
 public:
 	euroOption(double strike, double expiry);
 	virtual double priceByBSFormula(double spot, double sigma, double r) = 0;
