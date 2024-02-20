@@ -1,5 +1,4 @@
 #include"test_histogram.h"
-#include"histogram.h"
 #include<cassert>
 
 void testing_hist::testAdd() {

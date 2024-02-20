@@ -1,5 +1,4 @@
 #include"test_stats.h"
-#include"stats.h"
 #include<cassert>
 #include<iostream>
 #include<cmath>

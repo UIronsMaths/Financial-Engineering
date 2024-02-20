@@ -1,6 +1,4 @@
 #pragma once
-#include"pdf.h"
-#include"payoff.h"
 #include<iostream>
 #include<functional>
 

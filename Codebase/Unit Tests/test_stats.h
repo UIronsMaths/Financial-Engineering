@@ -1,4 +1,5 @@
 #pragma once
+#include"../stats.h"
 
 class testing_stats {
 public:

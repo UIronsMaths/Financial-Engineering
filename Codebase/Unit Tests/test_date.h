@@ -1,4 +1,6 @@
 #pragma once
+#include"../date.h"
+
 class testing_date {
 public:
 	void testDate();

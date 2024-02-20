@@ -1,5 +1,4 @@
 #include"test_linearInterpolation.h"
-#include"linearInterpolation.h"
 #include<cassert>
 
 void testing_linInt::testAdd() {
