@@ -29,15 +29,19 @@ Currently defunct code includes the classes in:
  	payoff.cpp/.h
   and their unit tests.
 
+## Project Classes.
+```stats``` is a class that allows the addition of data observations and includes methods that returns certain summary statistics of the data so far. It also includes a Random number generator for generating instances of a Standard Normally distributed random variable.
+
 ## Project Roadmap.
 Future modifications will include:
 
-	Extending the portfolio class, adding writing functionality to reflect trader made changes.
+	Extending the numerical integration class, removing limitations/adding user choice.
+ 	Extending the portfolio class, adding writing functionality to reflect trader made changes.
  	Extending the options class, adding an assortment of options.
   	Extending the pdf class, adding an assortment of PDFs.
+   
    	Introducing Monte Carlo pricing.
-    	Introducing Finite Difference Method pricing.
-     	Introducing stochastic parameter and jump diffusion models.
+	Introducing Finite Difference Method pricing.
+	Introducing stochastic parameter and jump diffusion models.
 
-## Project Classes.
-```stats``` is a class that allows the addition of data observations and includes methods that returns certain summary statistics of the data so far. It also includes a Random number generator for generating instances of a Standard Normally distributed random variable.
+Up next is: **Extending the options class**.
