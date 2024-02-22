@@ -18,6 +18,11 @@ double option::N(double x) {
 	}
 }
 
+double option::phi(double x) {
+	const double pi = 4.0 * atan(1.0);
+	return (1 / sqrt(2 * pi)) * exp(-pow(x, 2) / 2);
+}
+
 bool euOption::earlyExercise() {
 	return false;
 }

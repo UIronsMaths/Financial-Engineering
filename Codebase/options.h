@@ -3,6 +3,22 @@
 #include<algorithm>
 #include<vector>
 
+//
+// The idea of the class structure in this file is to utilise the "Is a" relationships that exists in options.
+// For example:
+//     A European Option is an Option.
+//     A Path Independant Option can be an American or European Option.
+//     A Vanilla Call Option is a Path Independant European Option.
+// 
+// Each specific option will have it's own payoff function, payoff parameters and (if it exists) its own Black-Scholes formula.
+// Path Independant and Weakly Path Dependant Options can be priced using a Binomial Tree. 
+// So to reduce the number of copies of this code, we can implement it further up the class hierarchy.
+// Whether or not an option can be exercised early is a result of its time structure (European or American).
+// Again this is implemented further up the hierarchy.
+// And all options have an expiry time. Hence the base class is still useful.
+// 
+//
+
 class option {
 public:
 	option(double T) :m_T(T) {};
@@ -10,6 +26,7 @@ protected:
 	virtual double payoff(double spot) = 0;
 	virtual bool earlyExercise() = 0;
 	double N(double x);
+	double phi(double x);
 	virtual double BSAnalyticalPrice(double spot, double vol, double r) = 0;
 	virtual double priceByCRR(double spot, double vol, double r, int steps) = 0;
 	const double m_T;
