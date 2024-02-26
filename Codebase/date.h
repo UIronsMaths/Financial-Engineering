@@ -3,7 +3,6 @@
 #include<vector>
 #include<tuple>
 #include<set>
-#include"calendar.h"
 
 //
 // Forward declaration needed to avoid circular dependancy.
@@ -42,4 +41,13 @@ private:
     bool isLeapYear(int year);
     int countLeapYears(int startYear, int endYear);
 	int getDaysInMonth(int year, int month);
+};
+
+class calendar {
+	friend class testing_calendar;
+public:
+	void addHoliday(const date& dt);
+	bool isHoliday(const date& dt) const;
+private:
+	std::set<unsigned int> m_calendar;
 };

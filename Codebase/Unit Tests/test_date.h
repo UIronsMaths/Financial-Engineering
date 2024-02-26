@@ -16,3 +16,11 @@ private:
 	void testBD();
 	void testOperator();
 };
+
+class testing_calendar {
+public:
+	void testCalendar();
+private:
+	void testAddHol();
+	void testIsHol();
+};
