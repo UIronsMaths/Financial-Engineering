@@ -21,7 +21,7 @@ public:
 	void addDays(int days);
 	void addMonths(int months);
 	void addYears(int years);
-	int daysDiff(date dt);
+	int daysDiff(date dt) const;
 	enum Weekday weekday();
 	bool isGBD();
 	bool isGBD(const calendar& cal);

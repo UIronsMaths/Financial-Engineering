@@ -68,7 +68,7 @@ void date::addYears(int years)
 	m_serial = DMY_to_serial(day, month, year);
 }
 
-int date::daysDiff(date dt) {
+int date::daysDiff(date dt) const  {
 	return m_serial - dt.getSerial();
 }
 
