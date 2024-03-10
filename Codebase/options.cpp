@@ -2,7 +2,7 @@
 
 /********************************** Option Base Classe (General & Time structure specific) **********************************/
 
-double option::N(double x) {
+double option::N(const double& x) const {
 	const double gamma = 0.2316419;
 	const double a1 = 0.319381530;
 	const double a2 = -0.356563782;
@@ -20,12 +20,12 @@ double option::N(double x) {
 	}
 }
 
-double option::phi(double x) {
+double option::phi(const double& x) const {
 	const double pi = 4.0 * atan(1.0);
 	return (1 / sqrt(2 * pi)) * exp(-pow(x, 2) / 2);
 }
 
-bool option::earlyExercise() {
+bool option::earlyExercise() const  {
 	if (m_timeStruct == Eu) {
 		return false;
 	}
@@ -34,11 +34,11 @@ bool option::earlyExercise() {
 	}
 }
 
-bool option::pathDependancy() { return false; }
+bool option::pathDependancy() const { return false; }
 
-double option::pathCondition(double treeNode, double spot) { return 0.0; }
+double option::pathCondition(const double& treeNode, const double& spot) const { return 0.0; }
 
-double option::binomialPrice(double spot, double vol, double r, int steps) {
+double option::binomialPriceCRR(const double& spot, const double& vol, const double& r, const int& steps) const {
 	const double delta = m_T / steps;
 	const double u = exp(vol * sqrt(delta));
 	const double d = 1.0 / u;
@@ -82,7 +82,51 @@ double option::binomialPrice(double spot, double vol, double r, int steps) {
 	return v[0];
 }
 
-double option::trinomialPrice(double spot, double vol, double r, int steps, double lambda) {
+double option::binomialPriceJR(const double& spot, const double& vol, const double& r, const int& steps) const {
+	const double delta = m_T / steps;
+	const double u = exp((r - vol * vol / 2) * delta + vol * sqrt(delta));
+	const double d = exp((r - vol * vol / 2) * delta - vol * sqrt(delta));
+	const double R = exp(r * delta) - 1.0;
+
+	const double qu = (1.0 + R - d) / (u - d);
+	const double qd = 1.0 - qu;
+
+	std::vector<double> v(steps + 1);
+	for (int i = 0; i <= steps; ++i)
+	{
+		const double ST = spot * pow(u, i) * pow(d, steps - i);
+		v[i] = payoff(ST);
+	}
+	for (int n = steps - 1; n >= 0; --n)
+	{
+		for (int i = 0; i <= n; ++i)
+		{
+			//
+			// Weak Path dependancy modification.
+			//
+			if (pathDependancy()) {
+				const double S = spot * pow(u, i) * pow(d, n - i);
+				v[i] = pathCondition((qu * v[i + 1] + qd * v[i]) / (1.0 + R), S);
+			}
+			else {
+				v[i] = (qu * v[i + 1] + qd * v[i]) / (1.0 + R);
+			}
+			if (earlyExercise())
+			{
+				const double S = spot * pow(u, i) * pow(d, n - i);
+				double exerciseValue = payoff(S);
+				if (pathDependancy()) {
+					exerciseValue = pathCondition(exerciseValue, S);
+				}
+				if (exerciseValue > v[i])
+					v[i] = exerciseValue;
+			}
+		}
+	}
+	return v[0];
+}
+
+double option::trinomialPrice(const double& spot, const double& vol, const double& r, const int& steps, const double& lambda) const  {
 	const double delta = m_T / steps;
 	const double u = exp(lambda * vol * sqrt(delta));
 	const double d = 1.0 / u;
@@ -129,9 +173,25 @@ double option::trinomialPrice(double spot, double vol, double r, int steps, doub
 	return v[0];
 }
 
+double option::priceByNumericalInt(const double& spot, const double& vol, const double& r, const int& steps) const {
+	const double mean = log(spot) + ((r - (0.5 * pow(vol, 2))) * m_T);
+	const double var = pow(vol * sqrt(m_T), 2);
+	const double upperLim = 5 * spot;
+
+	numericalIntegration numInt;
+	pdf pf;
+
+	double res = numInt.trapezium(
+		[this, &pf, &mean, &var, &upperLim](const double& x) -> double {return pf.lognormal(x, mean, var) * payoff(x); }
+	, 0.0, upperLim, steps);
+
+	res *= exp(-r * m_T);
+	return res;
+}
+
 /************************************** Option Base Classes (Payoff structure specific) **************************************/
 
-double vanilla::payoff(double spot) {
+double vanilla::payoff(const double& spot) const {
 	if (m_type == Call) {
 		return spot > m_K ? spot - m_K : 0.0;
 	}
@@ -140,72 +200,72 @@ double vanilla::payoff(double spot) {
 	}
 }
 
-double vanilla::d_plus(double spot, double sigma, double r) {
+double vanilla::d_plus(const double& spot, const double& sigma, const double& r) const  {
 	return (log(spot / m_K) + (r + 0.5 * pow(sigma, 2)) * m_T) / (sigma * sqrt(m_T));
 }
 
-double vanilla::d_minus(double spot, double sigma, double r) {
+double vanilla::d_minus(const double& spot, const double& sigma, const double& r) const  {
 	return d_plus(spot, sigma, r) - sigma * sqrt(m_T);
 }
 
 
 
 // This will be modified with the addition of more barrier options.
-double barrier::payoff(double spot) {
+double barrier::payoff(const double& spot) const {
 	return spot < m_B ? std::max(spot - m_K, 0.0) : 0.0;
 }
 
-double barrier::D(double x, double r, double vol, double T) {
+double barrier::D(const double& x, const double& r, const double& vol, const double& T) const  {
 	return (log(x) + (r + (0.5 * pow(vol, 2))) * T) / (vol * sqrt(T));
 }
 // This will be modified with the addition of more barrier options.
-bool barrier::pathDependancy() {
+bool barrier::pathDependancy() const  {
 	return true;
 }
 // This will be modified with the addition of more barrier options.
-double barrier::pathCondition(double treeNode, double spot) {
+double barrier::pathCondition(const double& treeNode, const double& spot) const  {
 	return spot < m_B ? treeNode : 0.0;
 }
 
 /***************************************** Option Derived Classes (Specific Options) *****************************************/
 
-double vanillaEuroCall::BSAnalyticalPrice(double spot, double sigma, double r) {
-	return (spot * N(d_plus(spot, sigma, r))) - (m_K * exp(-r * m_T) * N(d_minus(spot, sigma, r)));
+double vanillaEuroCall::BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const {
+	return (spot * N(d_plus(spot, vol, r))) - (m_K * exp(-r * m_T) * N(d_minus(spot, vol, r)));
 }
 
-double vanillaEuroCall::deltaByBSFormula(double spot, double sigma, double r) {
-	return N(d_plus(spot, sigma, r));
+double vanillaEuroCall::deltaByBSFormula(const double& spot, const double& vol, const double& r) const {
+	return N(d_plus(spot, vol, r));
 }
 
-double vanillaEuroCall::gammaByBSFormula(double spot, double sigma, double r) {
-	return phi(d_plus(spot, sigma, r)) / (spot * sigma * sqrt(m_T));
+double vanillaEuroCall::gammaByBSFormula(const double& spot, const double& vol, const double& r) const {
+	return phi(d_plus(spot, vol, r)) / (spot * vol * sqrt(m_T));
 }
 
-double vanillaEuroCall::thetaByBSFormula(double spot, double sigma, double r) {
-	return -(spot * phi(d_plus(spot, sigma, r)) * sigma) / (2 * sqrt(m_T)) - (r * m_K * exp(-r * m_T) * N(d_minus(spot, sigma, r)));
-}
-
-
-
-double vanillaEuroPut::BSAnalyticalPrice(double spot, double sigma, double r) {
-	return (m_K * exp(-r * m_T) * N(-d_minus(spot, sigma, r))) - (spot * N(-d_plus(spot, sigma, r)));
-}
-
-double vanillaEuroPut::deltaByBSFormula(double spot, double sigma, double r) {
-	return N(d_plus(spot, sigma, r)) - 1;
-}
-
-double vanillaEuroPut::gammaByBSFormula(double spot, double sigma, double r) {
-	return phi(d_plus(spot, sigma, r)) / (spot * sigma * sqrt(m_T));
-}
-
-double vanillaEuroPut::thetaByBSFormula(double spot, double sigma, double r) {
-	return -(spot * phi(d_plus(spot, sigma, r)) * sigma) / (2 * sqrt(m_T)) + (r * m_K * exp(-r * m_T) * N(-d_minus(spot, sigma, r)));
+double vanillaEuroCall::thetaByBSFormula(const double& spot, const double& vol, const double& r) const {
+	return -(spot * phi(d_plus(spot, vol, r)) * vol) / (2 * sqrt(m_T)) - (r * m_K * exp(-r * m_T) * N(d_minus(spot, vol, r)));
 }
 
 
 
-double UpAndOutEuroCall::BSAnalyticalPrice(double spot, double vol, double r) {
+double vanillaEuroPut::BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const {
+	return (m_K * exp(-r * m_T) * N(-d_minus(spot, vol, r))) - (spot * N(-d_plus(spot, vol, r)));
+}
+
+double vanillaEuroPut::deltaByBSFormula(const double& spot, const double& vol, const double& r) const {
+	return N(d_plus(spot, vol, r)) - 1;
+}
+
+double vanillaEuroPut::gammaByBSFormula(const double& spot, const double& vol, const double& r) const {
+	return phi(d_plus(spot, vol, r)) / (spot * vol * sqrt(m_T));
+}
+
+double vanillaEuroPut::thetaByBSFormula(const double& spot, const double& vol, const double& r) const {
+	return -(spot * phi(d_plus(spot, vol, r)) * vol) / (2 * sqrt(m_T)) + (r * m_K * exp(-r * m_T) * N(-d_minus(spot, vol, r)));
+}
+
+
+
+double UpAndOutEuroCall::BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const {
 	double d1 = D(spot / m_K, r, vol, m_T);
 	double d2 = d1 - vol * sqrt(m_T);
 	double d3 = D(spot / m_B, r, vol, m_T);

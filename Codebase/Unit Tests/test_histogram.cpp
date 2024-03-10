@@ -57,7 +57,6 @@ void testing_hist::testAdd() {
 	assert(test4.m_histogram.at(1) == 1);
 	assert(test4.m_overflow == 1);
 }
-
 void testing_hist::testGetRes() {
 	//
 	// Edge case: x == m_xmax. Without handling will count as an overflow.
@@ -98,7 +97,6 @@ void testing_hist::testGetRes() {
 	assert(res2[3].first == std::numeric_limits<double>::infinity());
 	assert(res2[3].second == 2);
 }
-
 void testing_hist::testHist() {
 	testAdd();
 	testGetRes();

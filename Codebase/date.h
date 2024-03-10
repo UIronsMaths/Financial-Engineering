@@ -14,33 +14,43 @@ class date {
 public:
 	enum Weekday { Monday = 1, Tuesday = 2, Wednesday = 3, Thursday = 4, Friday = 5, Saturday = 6, Sunday = 7 };
 
-	date(unsigned int day, unsigned int month, unsigned int year);
-	date(unsigned int numDays);
+	date(const unsigned int& day, const unsigned int& month, const unsigned int& year);
+	date(const unsigned int& numDays);
+	date(const date& other);
 	int getSerial() const;
-	std::tuple<int, int, int> getDMY();
-	void addDays(int days);
-	void addMonths(int months);
-	void addYears(int years);
-	int daysDiff(date dt) const;
-	enum Weekday weekday();
-	bool isGBD();
-	bool isGBD(const calendar& cal);
+	std::tuple<int, int, int> getDMY() const;
+	void addDays(const int& days);
+	void addMonths(const int& months);
+	void addYears(const int& years);
+	int daysDiff(const date& dt) const;
+	enum Weekday weekday() const;
+	bool isGBD() const;
+	bool isGBD(const calendar& cal) const;
 	void rollToGBD();
 	void rollToGBD(const calendar& cal);
-	void addBusinessDays(int days);
+	void addBusinessDays(const int& days);
 
-	date operator++();
-	bool operator!=(date dt);
+	date& operator++();
+	date& operator--();
+	date& operator+=(const int& days);
+	date& operator-(const int& days);
+	int operator-(const date& dt) const;
+	bool operator!=(const date& dt) const;
+	bool operator==(const date& dt) const;
+	bool operator<(const date& dt) const;
+	bool operator>(const date& dt) const;
+
+	friend std::ostream& operator<<(std::ostream& os, const date& dt);
 
 private:
 	unsigned int m_serial;
 
-	int DMY_to_serial(int day, int month, int year);
-	void serial_to_DMY(int m_serial, unsigned int& day, unsigned int& month, unsigned int& year);
-    bool isValidDate(int day, int month, int year);
-    bool isLeapYear(int year);
-    int countLeapYears(int startYear, int endYear);
-	int getDaysInMonth(int year, int month);
+	int DMY_to_serial(const int& day, const int& month, const int& year) const;
+	void serial_to_DMY(const unsigned int m_serial, unsigned int& day, unsigned int& month, unsigned int& year) const;
+    bool isValidDate(const int& day, const int& month, const int& year) const;
+    bool isLeapYear(const int& year) const;
+    int countLeapYears(const int& startYear, const int& endYear) const;
+	int getDaysInMonth(const int& year, const int& month) const;
 };
 
 class calendar {

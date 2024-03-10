@@ -15,7 +15,6 @@ void testing_date::testDate() {
 	testOperator();
 	std::cout << "All testcases passed." << std::endl;
 }
-
 void testing_date::testDMYSerial() {
 
 	date test1(11, 2, 2024);
@@ -27,7 +26,6 @@ void testing_date::testDMYSerial() {
 	date test3(01, 01, 1900);
 	assert(test3.getSerial() == 1);
 }
-
 void testing_date::testSerialDMY() {
 
 	date test1(11, 2, 2024);
@@ -40,7 +38,6 @@ void testing_date::testSerialDMY() {
 	test2.serial_to_DMY(test2.m_serial, day, month, year);
 	assert(day == 1 && month == 1 && year == 1900);
 }
-
 void testing_date::testValidDate() {
 
 	date test(11, 2, 2024);
@@ -51,7 +48,6 @@ void testing_date::testValidDate() {
 	assert(test.isValidDate(001, 1, 2024));
 	assert(!test.isValidDate(31, 12, 1899));
 }
-
 void testing_date::testDaysInMonth() {
 
 	date test(11, 2, 2024);
@@ -70,21 +66,18 @@ void testing_date::testDaysInMonth() {
 		assert(res == daysInMonth[i]);
 	}
 }
-
 void testing_date::testLeapCount() {
 
 	date test(11, 2, 2024);
 	int res = test.countLeapYears(2000, 2020);
 	assert(res == 6);
 }
-
 void testing_date::testGetDMY() {
 
 	date test(11, 2, 2024);
 	std::tuple<int, int, int> res = test.getDMY();
 	assert(std::get<0>(res) == 11 && std::get<1>(res) == 2 && std::get<2>(res) == 2024);
 }
-
 void testing_date::testWeekday() {
 
 	date test1(11, 2, 2024);
@@ -96,7 +89,6 @@ void testing_date::testWeekday() {
 	date test3(1, 1, 1900);
 	assert(test3.weekday() == test3.Monday);
 }
-
 void testing_date::testAdd() {
 
 	date test1(11, 2, 2024);
@@ -110,7 +102,6 @@ void testing_date::testAdd() {
 	res = test1.getDMY();
 	assert(std::get<1>(res) == 3 && std::get<2>(res) == 2025);
 }
-
 void testing_date::testBD() {
 
 	date test(16, 2, 2024);
@@ -118,7 +109,6 @@ void testing_date::testBD() {
 	test.addBusinessDays(1);
 	assert(test.isGBD() && test.weekday() == test.Monday);
 }
-
 void testing_date::testOperator() {
 
 	date test1(15, 2, 2024);
@@ -127,14 +117,23 @@ void testing_date::testOperator() {
 	assert(std::get<0>(res) == 16);
 	date test2(15, 2, 2024);
 	assert(test1 != test2);
+	date test3(15, 2, 2024);
+	assert(test2 == test3);
+	--test1;
+	assert(test1 == test2 && test1 == test3);
+	test1 += 7;
+	res = test1.getDMY();
+	assert(std::get<0>(res) == 22);
+	test1 - 2;
+	res = test1.getDMY();
+	assert(std::get<0>(res) == 20);
+	assert(test1 > test2 && test3 < test1);
 }
-
 void testing_calendar::testCalendar() {
 	testAddHol();
 	testIsHol();
 	std::cout << "All testcases passed." << std::endl;
 }
-
 void testing_calendar::testAddHol() {
 	calendar test;
 	date dt1(1, 1, 2024);
@@ -143,7 +142,6 @@ void testing_calendar::testAddHol() {
 	test.addHoliday(dt2);
 	assert(test.m_calendar.find(dt1.getSerial()) != test.m_calendar.end() && test.m_calendar.find(dt2.getSerial()) != test.m_calendar.end());
 }
-
 void testing_calendar::testIsHol() {
 	calendar test;
 	date dt1(1, 1, 2024);

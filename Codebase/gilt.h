@@ -25,7 +25,7 @@ public:
 	gilt_rootFinding_adapterFunction(const gilt g, date settlement)
 		:m_g(g), m_settlement(settlement)
 	{}
-	virtual double eval(double x) const;
+	virtual double eval(const double& x) const;
 private:
 	const gilt m_g;
 	date m_settlement;

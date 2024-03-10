@@ -1,6 +1,10 @@
 #include"rootFinding.h"
 
-double findRoot::bisectionSolver(const findRoot_adapterFunction* f, double target, double left, double right, double accuracy) {
+double findRoot::derivativeO4(const findRoot_adapterFunction* f, const double& x, const double& delta) const {
+    return (8 * (f->eval(x + delta) - f->eval(x - delta)) - f->eval(x + 2 * delta) + f->eval(x - 2 * delta)) / (12 * delta);
+}
+
+double findRoot::bisectionSolver(const findRoot_adapterFunction* f, const double& target, double left, double right, const double& accuracy) const {
     double l = f->eval(left);
     double r = f->eval(right);
 
@@ -21,4 +25,12 @@ double findRoot::bisectionSolver(const findRoot_adapterFunction* f, double targe
     }
     // You may return either left or right, they are very close to each other at this point.
     return left;
+}
+
+double findRoot::NewtonRaphson(const findRoot_adapterFunction* f, const double& initial, const double& accuracy) const {
+    double ansatz = initial;
+    while (abs(f->eval(ansatz)) >= accuracy) {
+        ansatz -= (f->eval(ansatz) / derivativeO4(f, ansatz, 0.001));
+    }
+    return ansatz;
 }

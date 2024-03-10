@@ -20,7 +20,7 @@ double gilt::yield(date settlement, double price) const {
 	return fr.bisectionSolver(&ga, 1.0 / price, 0, 1, 1e-6);
 }
 
-double gilt_rootFinding_adapterFunction::eval(double x) const {
+double gilt_rootFinding_adapterFunction::eval(const double& x) const {
 
 	//
 	// Again, due to the inverse relationship between yields and prices, Our adapter class needs to return the reciprocal of price.

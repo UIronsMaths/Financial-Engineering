@@ -10,18 +10,18 @@ class histogram {
 	friend class testing_hist;
 
 public:
-	histogram(double minval, double maxval, int bins);
-	void add(double x);
-	std::vector<std::pair<double, int>> getResults();
-	void writeResultsToStream(bool writeToConsole, const std::string& filename = "");
+	histogram(const double& minval, const double& maxval, const int& bins);
+	void add(const double& x);
+	std::vector<std::pair<double, int>> getResults() const;
+	void writeResultsToStream(const bool& writeToConsole, const std::string& filename = "");
 
 private:
-	double m_xmin;
-	double m_xmax;
-	int m_bins;
+	const double m_xmin;
+	const double m_xmax;
+	const int m_bins;
 	int m_overflow;
 	int m_underflow;
 	std::vector<int> m_histogram;
 
-	double m_interval;
+	const double m_interval;
 };

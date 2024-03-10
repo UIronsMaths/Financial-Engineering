@@ -3,7 +3,7 @@
 linInterpolation::linInterpolation()
     :m_maxX(INT_MIN), m_minX(INT_MAX)
 {}
-void linInterpolation::add(double x, double y) 
+void linInterpolation::add(const double& x, const double& y) 
 {
     //
     // Edge case: adding duplicates.
@@ -22,7 +22,7 @@ void linInterpolation::add(double x, double y)
         m_maxX = x;
     }
 }
-double linInterpolation::value(double x)
+double linInterpolation::value(const double& x)
 {
     //
     // Edge case: too few data points.

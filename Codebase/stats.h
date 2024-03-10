@@ -2,16 +2,18 @@
 #include<iostream>
 #include<cmath>
 
-const double pi = 3.1415926535897932;
-
+const double pi = 4.0 * atan(1.0);
 
 class stats1D {
+	friend class testing_stats;
 public:
-	stats1D();
-	void add(double x);
-	double mean();
-	double var();
-	double stDev();
+	stats1D()
+		:m_size(0), m_sum(0), m_sumsquared(0)
+	{};
+	void add(const double& x);
+	double mean() const;
+	double var() const;
+	double stDev() const;
 private:
 	int m_size;
 	double m_sum;
@@ -19,19 +21,22 @@ private:
 };
 
 class stats2D {
+	friend class testing_stats;
 public:
-	stats2D();
-	void add(double x, double y);
-	double meanX();
-	double varX();
-	double stDevX();
-	double meanY();
-	double varY();
-	double stDevY();
-	double cov();
-	double corr();
-	double lineargradient();
-	double linearintercept();
+	stats2D()
+		:m_size(0), m_sum_x(0), m_sumsquared_x(0), m_sum_y(0), m_sumsquared_y(0), m_sum_xy(0)
+	{}
+	void add(const double& x, const double& y);
+	double meanX() const;
+	double varX() const;
+	double stDevX() const;
+	double meanY() const;
+	double varY() const;
+	double stDevY() const;
+	double cov() const;
+	double corr() const;
+	double lineargradient() const;
+	double linearintercept() const;
 private:
 	int m_size;
 	double m_sum_x;
@@ -42,11 +47,12 @@ private:
 };
 
 class NormalRandomGenerator {
+	friend class testing_stats;
 public:
-	NormalRandomGenerator();
+	NormalRandomGenerator() :m_boolFlag(false), m_val(0.0) {};
 	double generate();
 private:
-	double m_U1;
-	double m_U2;
+	bool m_boolFlag;
+	double m_val;
 	double boxMuller();
 };

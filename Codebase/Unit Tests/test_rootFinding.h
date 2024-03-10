@@ -8,4 +8,6 @@ public:
 	void testFindRoot();
 private:
 	void testBisection();
+	void testNewtonRaphson();
+	void testDerivative();
 };

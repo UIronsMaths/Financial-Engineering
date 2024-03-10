@@ -1,10 +1,9 @@
 #include"histogram.h"
 
-histogram::histogram(double minval, double maxval, int bins)
+histogram::histogram(const double& minval, const double& maxval, const int& bins)
 	:m_xmin(minval), m_xmax(maxval), m_bins(bins), m_interval((maxval-minval)/bins), m_histogram(m_bins), m_underflow(0), m_overflow(0)
 {}
-
-void histogram::add(double x) 
+void histogram::add(const double& x) 
 {
 	int bin = static_cast<int>(floor((x-m_xmin) / m_interval));
 	//
@@ -29,8 +28,7 @@ void histogram::add(double x)
 		}
 	}
 }
-
-std::vector<std::pair<double, int>> histogram::getResults()
+std::vector<std::pair<double, int>> histogram::getResults() const
 {
 	std::vector<std::pair<double, int>> out;
 	out.push_back({ m_xmin, m_underflow });
@@ -41,8 +39,7 @@ std::vector<std::pair<double, int>> histogram::getResults()
 	out.push_back({ std::numeric_limits<double>::infinity(), m_overflow });
 	return out;
 }
-
-void histogram::writeResultsToStream(bool writeToConsole, const std::string& filename) {
+void histogram::writeResultsToStream(const bool& writeToConsole, const std::string& filename) {
 
 	std::ofstream fileStream;
 	std::ostream& os = (writeToConsole || filename.empty()) ? std::cout : (fileStream.open(filename), fileStream);

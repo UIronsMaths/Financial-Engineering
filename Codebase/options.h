@@ -2,6 +2,10 @@
 #include<cmath>
 #include<algorithm>
 #include<vector>
+#include"pdf.h"
+#include"numericalIntegration.h"
+#include"rootFinding.h"
+#include"linearInterpolation.h"
 
 //
 // The idea of the class structure in this file is to utilise the "Is a" relationships that exists in options.
@@ -24,6 +28,10 @@
 
 /******************************************* Option Base Class (General structure) *******************************************/
 
+//
+// Black - Scholes model assumed.
+//
+
 class option {
 	friend class testing_options;
 public:
@@ -35,38 +43,39 @@ public:
 		Eu,
 		Am
 	};
-	option(double T, optionType type, timeStruct(ts)) :m_T(T), m_type(type), m_timeStruct(ts) {};
+	option(const double& T, const optionType& type, const timeStruct& ts) :m_T(T), m_type(type), m_timeStruct(ts) {};
 protected:
 
 	//
 	// Pricing methods
 	//
-	double binomialPrice(double spot, double vol, double r, int steps);
-	double trinomialPrice(double spot, double vol, double r, int steps, double lambda);
-	double priceByNumericalInt(double spot, double vol, double r);
+	double binomialPriceCRR(const double& spot, const double& vol, const double& r, const int& steps) const;
+	double binomialPriceJR(const double& spot, const double& vol, const double& r, const int& steps) const;
+	double trinomialPrice(const double& spot, const double& vol, const double& r, const int& steps, const double& lambda) const;
+	double priceByNumericalInt(const double& spot, const double& vol, const double& r, const int& steps) const;
 
 	//
 	// Polymorphic functions, defined in the payoff class when payoff class is initialised.
 	// Definition will depend of initialisation of payoff class.
 	//
-	virtual double payoff(double spot) = 0;
-	virtual bool earlyExercise();
+	virtual double payoff(const double& spot) const = 0;
+	virtual bool earlyExercise() const;
 	
 	//
 	// Defaults. Have not made these polymorphic as not all options have these conditions.
 	// These are overridden in the payoff classes that will see these used.
 	//
-	virtual bool pathDependancy();
-	virtual double pathCondition(double treeNode, double spot);
+	virtual bool pathDependancy() const;
+	virtual double pathCondition(const double& treeNode, const double& spot) const;
 
 	//
 	// Generic methods used for a variety of functions across all kinds of options.
 	//
-	double N(double x);
-	double phi(double x);
+	double N(const double& x) const;
+	double phi(const double& x) const;
 	const double m_T;
-	optionType m_type;
-	timeStruct m_timeStruct;
+	const optionType m_type;
+	const timeStruct m_timeStruct;
 };
 
 /************************************** Option Base Classes (Payoff structure specific) **************************************/
@@ -74,17 +83,19 @@ protected:
 class vanilla : public option {
 	friend class testing_options;
 public:
-	vanilla(double strike, double expiry, optionType type, timeStruct ts) : m_K(strike), option(expiry, type, ts) {};
-	using option::binomialPrice;
+	vanilla(const double& strike, const double& expiry, const optionType& type, const timeStruct& ts) : m_K(strike), option(expiry, type, ts) {};
+	using option::binomialPriceCRR;
+	using option::binomialPriceJR;
 	using option::trinomialPrice;
-	double payoff(double spot);
+	using option::priceByNumericalInt;
+	double payoff(const double& spot) const;
 protected:
 
 	//
 	// Payoff specific functions
 	//
-	double d_plus(double spot, double sigma, double r);
-	double d_minus(double spot, double sigma, double r);
+	double d_plus(const double& spot, const double& sigma, const double& r) const;
+	double d_minus(const double& spot, const double& sigma, const double& r) const;
 
 	//
 	// Payoff specific member variables.
@@ -95,18 +106,19 @@ protected:
 class barrier : public option {
 	friend class testing_options;
 public:
-	barrier(double strike, double expiry, double barrier, optionType type, timeStruct ts) : m_K(strike), m_B(barrier), option(expiry, type, ts) {};
-	using option::binomialPrice;
+	barrier(const double& strike, const double& expiry, const double& barrier, const optionType& type, const timeStruct& ts) : m_K(strike), m_B(barrier), option(expiry, type, ts) {};
+	using option::binomialPriceCRR;
+	using option::binomialPriceJR;
 	using option::trinomialPrice;
-	double payoff(double spot);
+	double payoff(const double& spot) const;
 protected:
 
 	//
 	// Payoff specific functions
 	//
-	double D(double x, double r, double vol, double expiry);
-	bool pathDependancy() override;
-	virtual double pathCondition(double treeNode, double spot) override;
+	double D(const double& x, const double& r, const double& vol, const double& expiry) const;
+	bool pathDependancy() const override;
+	virtual double pathCondition(const double& treeNode, const double& spot) const override;
 
 	//
 	// Payoff specific member variables.
@@ -127,38 +139,38 @@ protected:
 
 class vanillaEuroCall : public vanilla {
 public:
-	vanillaEuroCall(double strike, double expiry) : vanilla(strike, expiry, Call, Eu) {};
+	vanillaEuroCall(const double& strike, const double& expiry) : vanilla(strike, expiry, Call, Eu) {};
 
-	double BSAnalyticalPrice(double spot, double vol, double r);
-	double deltaByBSFormula(double spot, double sigma, double r);
-	double gammaByBSFormula(double spot, double sigma, double r);
-	double thetaByBSFormula(double spot, double sigma, double r);
+	double BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const;
+	double deltaByBSFormula(const double& spot, const double& vol, const double& r) const;
+	double gammaByBSFormula(const double& spot, const double& vol, const double& r) const;
+	double thetaByBSFormula(const double& spot, const double& vol, const double& r) const;
 };
 
 class vanillaEuroPut : public vanilla {
 public:
-	vanillaEuroPut(double strike, double expiry) :vanilla(strike, expiry, Put, Eu) {};
+	vanillaEuroPut(const double& strike, const double& expiry) :vanilla(strike, expiry, Put, Eu) {};
 
-	double BSAnalyticalPrice(double spot, double vol, double r);
-	double deltaByBSFormula(double spot, double sigma, double r);
-	double gammaByBSFormula(double spot, double sigma, double r);
-	double thetaByBSFormula(double spot, double sigma, double r);
+	double BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const;
+	double deltaByBSFormula(const double& spot, const double& vol, const double& r) const;
+	double gammaByBSFormula(const double& spot, const double& vol, const double& r) const;
+	double thetaByBSFormula(const double& spot, const double& vol, const double& r) const;
 };
 
 class vanillaAmCall : public vanilla {
 public:
-	vanillaAmCall(double strike, double expiry) :vanilla(strike, expiry, Call, Am) {};
+	vanillaAmCall(const double& strike, const double& expiry) :vanilla(strike, expiry, Call, Am) {};
 };
 
 class vanillaAmPut : public vanilla {
 public:
-	vanillaAmPut(double strike, double expiry) :vanilla(strike, expiry, Put, Am) {};
+	vanillaAmPut(const double& strike, const double& expiry) :vanilla(strike, expiry, Put, Am) {};
 };
 
 
 
 class UpAndOutEuroCall : public barrier {
 public:
-	UpAndOutEuroCall(double strike, double expiry, double barrier) :barrier(strike, expiry, barrier, Call, Eu){};
-	double BSAnalyticalPrice(double spot, double vol, double r);
+	UpAndOutEuroCall(const double& strike, const double& expiry, const double& barrier) :barrier(strike, expiry, barrier, Call, Eu){};
+	double BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const;
 };

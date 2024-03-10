@@ -5,7 +5,7 @@
 
 class testing_pdf {
 public:
-	void testPDF();
+	void testPDF() const;
 private:
-	void testLogNorm();
+	void testLogNorm() const;
 };

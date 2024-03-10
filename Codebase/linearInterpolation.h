@@ -9,8 +9,8 @@ class linInterpolation {
 
 public:
     linInterpolation();
-    void add(double x, double y);
-    double value(double x);
+    void add(const double& x, const double& y);
+    double value(const double& x);
 
 private:
     std::map<double, double> m_points;

@@ -3,7 +3,7 @@
 #include<iostream>
 #include<cmath>
 
-void testing_stats::testMean()
+void testing_stats::testMean() const 
 {
 	//
 	// Basic mean of 1, 2, 3
@@ -80,7 +80,7 @@ void testing_stats::testMean()
         assert(true);
     }
 }
-void testing_stats::testVar()
+void testing_stats::testVar() const 
 {
     //
     // Basic variance of 1, 2, 3
@@ -135,7 +135,7 @@ void testing_stats::testVar()
     assert(test6.varX() == 0);
     assert(test6.varY() == 0);
 }
-void testing_stats::testStDev()
+void testing_stats::testStDev() const 
 {
     //
     // Basic standard deviation of 1, 2, 3
@@ -190,7 +190,7 @@ void testing_stats::testStDev()
     assert(test6.stDevX() == 0);
     assert(test6.stDevY() == 0);
 }
-void testing_stats::testCov()
+void testing_stats::testCov() const 
 {
     //
     // Covariance of 1, 2, 3
@@ -217,7 +217,7 @@ void testing_stats::testCov()
     test3.add(42, 42);
     assert(test3.cov() == 0);
 }
-void testing_stats::testCorr()
+void testing_stats::testCorr() const 
 {
     //
     // Correlation of 1, 2, 3
@@ -252,7 +252,7 @@ void testing_stats::testCorr()
         assert(true);
     }
 }
-void testing_stats::testLinGrad()
+void testing_stats::testLinGrad() const 
 {
     //
     // Linear gradient of 1, 2, 3
@@ -298,7 +298,7 @@ void testing_stats::testLinGrad()
         assert(true);
     }
 }
-void testing_stats::testLinInt()
+void testing_stats::testLinInt() const 
 {
     //
     // Linear intercept of 1, 2, 3
@@ -344,7 +344,11 @@ void testing_stats::testLinInt()
         assert(true);
     }
 }
-void testing_stats::testGen() {
+void testing_stats::testGen() const  {
+
+    //
+    // Test Case 1: Correctness test. Standard normal variable generated.
+    //
     NormalRandomGenerator testG1;
     stats1D testS1;
     for (int i = 0; i < 10000; i++) {
@@ -354,7 +358,8 @@ void testing_stats::testGen() {
     assert(testS1.var() - 1 < 0.01);
 
     //
-    // The 21278th standards normal variable generated is generated as Inf.
+    // Edge Case: No undefined values generated.
+    // (undefined values will be generated without the small perturbation of U1 and U2 in the box-Muller algo)
     //
     stats1D testS2;
     NormalRandomGenerator testG2;
@@ -363,7 +368,7 @@ void testing_stats::testGen() {
     }
     assert(testS1.mean() < 0.01);
 }
-void testing_stats::test_stats() {
+void testing_stats::test_stats() const  {
     testMean();
     testVar();
     testStDev();
