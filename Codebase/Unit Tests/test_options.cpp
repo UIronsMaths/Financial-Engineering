@@ -38,10 +38,6 @@ void testing_options::testVanilla() {
 	assert(test.BSAnalyticalPrice(100, 0.25, 0.06) - 9.815 < 0.001 && test.deltaByBSFormula(100, 0.25, 0.06) - 0.589 < 0.001);
 	assert(test.gammaByBSFormula(100, 0.25, 0.06) - 0.018 < 0.001 && test.thetaByBSFormula(100, 0.25, 0.06) + 8.559 < 0.001);
 	assert(test.vanilla::d_plus(100, 0.25, 0.06) - 0.225 < 0.001 && test.vanilla::d_minus(100, 0.25, 0.06) - 0.008 < 0.001);
-	assert(test.binomialPriceCRR(100, 0.25, 0.06, 2) - 9.815 < 0.05);
-	assert(test.binomialPriceJR(100, 0.25, 0.06, 2) - 9.815 < 0.05);
-	assert(test.trinomialPrice(100, 0.25, 0.06, 2, 2) - 9.815 < 0.05);
-	assert(test.priceByNumericalInt(100, 0.25, 0.06, 100) - 9.815 < 0.05);
 
 	//
 	// Test Case 4: Correct Values given. (Euro Put)
@@ -59,10 +55,6 @@ void testing_options::testVanilla() {
 	assert(test2.BSAnalyticalPrice(100, 0.25, 0.06) - 7.326 < 0.001 && test2.deltaByBSFormula(100, 0.25, 0.06) + 0.411 < 0.001);
 	assert(test2.gammaByBSFormula(100, 0.25, 0.06) - 0.018 < 0.001 && test2.thetaByBSFormula(100, 0.25, 0.06) + 2.708 < 0.001);
 	assert(test2.vanilla::d_plus(100, 0.25, 0.06) - 0.225 < 0.001 && test2.vanilla::d_minus(100, 0.25, 0.06) - 0.008 < 0.001);
-	assert(test2.binomialPriceCRR(100, 0.25, 0.06, 2) - 7.326 < 0.05);
-	assert(test2.binomialPriceJR(100, 0.25, 0.06, 2) - 7.326 < 0.05);
-	assert(test2.trinomialPrice(100, 0.25, 0.06, 2, 0.25) - 7.326 < 0.05);
-	assert(test2.priceByNumericalInt(100, 0.25, 0.06, 100) - 7.326 < 0.05);
 }
 
 void testing_options::testBarrier() {
@@ -78,7 +70,4 @@ void testing_options::testBarrier() {
 	// Test Case 2: Correct Values given. (Up and Out Call)
 	//
 	assert(test1.BSAnalyticalPrice(98, 0.2, 0.05) - 3.2375 < 0.001);
-	assert(test1.binomialPriceCRR(98, 0.2, 0.05, 200) - 3.2375 < 0.05);
-	assert(test1.binomialPriceJR(98, 0.2, 0.05, 500) - 3.2375 < 0.2);
-	assert(test1.trinomialPrice(98, 0.2, 0.05, 200, 2) - 3.2375 < 0.05);
 }

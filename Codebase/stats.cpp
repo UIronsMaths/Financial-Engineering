@@ -29,6 +29,7 @@ double stats1D::stDev() const
 {
 	return std::sqrt(var());
 }
+int stats1D::size() const { return m_size; }
 void stats2D::add(const double& x, const double& y)
 {
 	m_size++;
@@ -121,6 +122,7 @@ double stats2D::linearintercept() const
 		throw std::runtime_error("Error in stats2D::linearintercept(). No Y-intercept term exists when X has no variability.");
 	}
 }
+int stats2D::size() const { return m_size; }
 double NormalRandomGenerator::boxMuller()
 {
 	if (m_boolFlag) {

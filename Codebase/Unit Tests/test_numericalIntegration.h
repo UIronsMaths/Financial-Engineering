@@ -2,7 +2,7 @@
 #include"../numericalIntegration.h"
 #include<cassert>
 #include"../pdf.h"
-#include"../options.h"
+#include"../vanillaOptions.h"
 
 class testing_numericalIntegration {
 public:

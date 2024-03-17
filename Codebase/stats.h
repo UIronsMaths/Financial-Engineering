@@ -14,6 +14,7 @@ public:
 	double mean() const;
 	double var() const;
 	double stDev() const;
+	int size() const;
 private:
 	int m_size;
 	double m_sum;
@@ -37,6 +38,7 @@ public:
 	double corr() const;
 	double lineargradient() const;
 	double linearintercept() const;
+	int size() const;
 private:
 	int m_size;
 	double m_sum_x;

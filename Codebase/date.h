@@ -3,6 +3,7 @@
 #include<vector>
 #include<tuple>
 #include<set>
+#include<chrono>
 
 //
 // Forward declaration needed to avoid circular dependancy.
@@ -17,6 +18,7 @@ public:
 	date(const unsigned int& day, const unsigned int& month, const unsigned int& year);
 	date(const unsigned int& numDays);
 	date(const date& other);
+	date();
 	int getSerial() const;
 	std::tuple<int, int, int> getDMY() const;
 	void addDays(const int& days);
@@ -51,6 +53,7 @@ private:
     bool isLeapYear(const int& year) const;
     int countLeapYears(const int& startYear, const int& endYear) const;
 	int getDaysInMonth(const int& year, const int& month) const;
+	std::tuple<int, int, int> getCurrentDate() const;
 };
 
 class calendar {

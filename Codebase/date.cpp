@@ -7,6 +7,10 @@ date::date(const unsigned int& numdays)
 	:m_serial(numdays)
 {}
 date::date(const date& other) :m_serial(other.m_serial) {}
+date::date() {
+    auto currentDate = getCurrentDate();
+    m_serial = (DMY_to_serial(std::get<0>(currentDate), std::get<1>(currentDate), std::get<2>(currentDate)));
+}
 int date::getSerial()const  
 {
 	return m_serial;
@@ -288,4 +292,11 @@ void calendar::addHoliday(const date& dt) {
 }
 bool calendar::isHoliday(const date& dt) const {
     return (m_calendar.find(dt.getSerial()) != m_calendar.end());
+}
+std::tuple<int, int, int> date::getCurrentDate() const {
+    auto now = std::chrono::system_clock::now();
+    time_t t = std::chrono::system_clock::to_time_t(now);
+    tm tm;
+    localtime_s(&tm, &t);
+    return std::make_tuple(tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
 }

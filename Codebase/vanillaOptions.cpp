@@ -1,4 +1,4 @@
-#include"options.h"
+#include"vanillaOptions.h"
 
 /********************************** Option Base Classe (General & Time structure specific) **********************************/
 
@@ -19,12 +19,10 @@ double option::N(const double& x) const {
 		return 1.0 - N(-x);
 	}
 }
-
 double option::phi(const double& x) const {
 	const double pi = 4.0 * atan(1.0);
 	return (1 / sqrt(2 * pi)) * exp(-pow(x, 2) / 2);
 }
-
 bool option::earlyExercise() const  {
 	if (m_timeStruct == Eu) {
 		return false;
@@ -33,161 +31,8 @@ bool option::earlyExercise() const  {
 		return true;
 	}
 }
-
 bool option::pathDependancy() const { return false; }
-
 double option::pathCondition(const double& treeNode, const double& spot) const { return 0.0; }
-
-double option::binomialPriceCRR(const double& spot, const double& vol, const double& r, const int& steps) const {
-	const double delta = m_T / steps;
-	const double u = exp(vol * sqrt(delta));
-	const double d = 1.0 / u;
-	const double R = exp(r * delta) - 1.0;
-
-	const double qu = (1.0 + R - d) / (u - d);
-	const double qd = 1.0 - qu;
-
-	std::vector<double> v(steps + 1);
-	for (int i = 0; i <= steps; ++i)
-	{
-		const double ST = spot * pow(u, i) * pow(d, steps - i);
-		v[i] = payoff(ST);
-	}
-	for (int n = steps - 1; n >= 0; --n)
-	{
-		for (int i = 0; i <= n; ++i)
-		{
-			//
-			// Weak Path dependancy modification.
-			//
-			if (pathDependancy()) {
-				const double S = spot * pow(u, i) * pow(d, n - i);
-				v[i] = pathCondition((qu * v[i + 1] + qd * v[i]) / (1.0 + R), S);
-			}
-			else {
-				v[i] = (qu * v[i + 1] + qd * v[i]) / (1.0 + R);
-			}
-			if (earlyExercise())
-			{
-				const double S = spot * pow(u, i) * pow(d, n - i);
-				double exerciseValue = payoff(S);
-				if (pathDependancy()) {
-					exerciseValue = pathCondition(exerciseValue, S);
-				}
-				if (exerciseValue > v[i])
-					v[i] = exerciseValue;
-			}
-		}
-	}
-	return v[0];
-}
-
-double option::binomialPriceJR(const double& spot, const double& vol, const double& r, const int& steps) const {
-	const double delta = m_T / steps;
-	const double u = exp((r - vol * vol / 2) * delta + vol * sqrt(delta));
-	const double d = exp((r - vol * vol / 2) * delta - vol * sqrt(delta));
-	const double R = exp(r * delta) - 1.0;
-
-	const double qu = (1.0 + R - d) / (u - d);
-	const double qd = 1.0 - qu;
-
-	std::vector<double> v(steps + 1);
-	for (int i = 0; i <= steps; ++i)
-	{
-		const double ST = spot * pow(u, i) * pow(d, steps - i);
-		v[i] = payoff(ST);
-	}
-	for (int n = steps - 1; n >= 0; --n)
-	{
-		for (int i = 0; i <= n; ++i)
-		{
-			//
-			// Weak Path dependancy modification.
-			//
-			if (pathDependancy()) {
-				const double S = spot * pow(u, i) * pow(d, n - i);
-				v[i] = pathCondition((qu * v[i + 1] + qd * v[i]) / (1.0 + R), S);
-			}
-			else {
-				v[i] = (qu * v[i + 1] + qd * v[i]) / (1.0 + R);
-			}
-			if (earlyExercise())
-			{
-				const double S = spot * pow(u, i) * pow(d, n - i);
-				double exerciseValue = payoff(S);
-				if (pathDependancy()) {
-					exerciseValue = pathCondition(exerciseValue, S);
-				}
-				if (exerciseValue > v[i])
-					v[i] = exerciseValue;
-			}
-		}
-	}
-	return v[0];
-}
-
-double option::trinomialPrice(const double& spot, const double& vol, const double& r, const int& steps, const double& lambda) const  {
-	const double delta = m_T / steps;
-	const double u = exp(lambda * vol * sqrt(delta));
-	const double d = 1.0 / u;
-	const double R = exp(r * delta) - 1.0;
-
-	const double M = exp(r * delta);
-	const double V = exp(2.0 * r * delta) * (exp(vol * vol * delta) - 1);
-	const double qu = (V + (M * M) - M) * u - (M - 1) / (u - 1) * ((u * u) - 1);
-	const double qd = (V + (M * M) - M) * (u * u) - (M - 1) * (u * u * u) / (u - 1) * ((u * u) - 1);
-	const double qm = 1 - qu - qd;
-
-	std::vector<double> v(2 * steps + 1);
-	for (int i = 0; i <= 2 * steps; ++i)
-	{
-		const double ST = spot * pow(u, std::max(i-steps, 0)) * pow(d, std::max(steps - i, 0));
-		v[i] = payoff(ST);
-	}
-	for (int n = steps - 1; n > 0; --n)
-	{
-		for (int i = 0; i <= 2 * n; ++i)
-		{
-			//
-			// Weak Path dependancy modification.
-			//
-			if (pathDependancy()) {
-				const double S = spot * pow(u, std::max(i - steps, 0)) * pow(d, std::max(steps - i, 0));
-				v[i] = pathCondition((qu * v[i + 2] + qm * v[i + 1] + qd * v[i]) / (1.0 + R), S);
-			}
-			else {
-				v[i] = (qu * v[i + 2] + qm * v[i + 1] + qd * v[i]) / (1.0 + R);
-			}
-			if (earlyExercise())
-			{
-				const double S = spot * pow(u, std::max(i - steps, 0)) * pow(d, std::max(steps - i, 0));
-				double exerciseValue = payoff(S);
-				if (pathDependancy()) {
-					exerciseValue = pathCondition(exerciseValue, S);
-				}
-				if (exerciseValue > v[i])
-					v[i] = exerciseValue;
-			}
-		}
-	}
-	return v[0];
-}
-
-double option::priceByNumericalInt(const double& spot, const double& vol, const double& r, const int& steps) const {
-	const double mean = log(spot) + ((r - (0.5 * pow(vol, 2))) * m_T);
-	const double var = pow(vol * sqrt(m_T), 2);
-	const double upperLim = 5 * spot;
-
-	numericalIntegration numInt;
-	pdf pf;
-
-	double res = numInt.trapezium(
-		[this, &pf, &mean, &var, &upperLim](const double& x) -> double {return pf.lognormal(x, mean, var) * payoff(x); }
-	, 0.0, upperLim, steps);
-
-	res *= exp(-r * m_T);
-	return res;
-}
 
 /************************************** Option Base Classes (Payoff structure specific) **************************************/
 
@@ -199,11 +44,9 @@ double vanilla::payoff(const double& spot) const {
 		return spot < m_K ? m_K - spot : 0.0;
 	}
 }
-
 double vanilla::d_plus(const double& spot, const double& sigma, const double& r) const  {
 	return (log(spot / m_K) + (r + 0.5 * pow(sigma, 2)) * m_T) / (sigma * sqrt(m_T));
 }
-
 double vanilla::d_minus(const double& spot, const double& sigma, const double& r) const  {
 	return d_plus(spot, sigma, r) - sigma * sqrt(m_T);
 }
@@ -214,7 +57,6 @@ double vanilla::d_minus(const double& spot, const double& sigma, const double& r
 double barrier::payoff(const double& spot) const {
 	return spot < m_B ? std::max(spot - m_K, 0.0) : 0.0;
 }
-
 double barrier::D(const double& x, const double& r, const double& vol, const double& T) const  {
 	return (log(x) + (r + (0.5 * pow(vol, 2))) * T) / (vol * sqrt(T));
 }
@@ -227,20 +69,36 @@ double barrier::pathCondition(const double& treeNode, const double& spot) const 
 	return spot < m_B ? treeNode : 0.0;
 }
 
+
+double chooser::d(const double& s, const double& r, const double& vol) const {
+	return (log(s / m_K) + (r + 0.5 * vol * vol) * m_T) / (vol * sqrt(m_T));
+}
+double chooser::y(const double& s, const double& r, const double& vol) const {
+	return (log(s / m_K) + (r * m_T) + (0.5 * vol * vol * m_Tc)) / (vol * sqrt(m_Tc));
+}
+double chooser::price(const double& s, const double& vol, const double& r) const {
+	return s * N(d(s, r, vol)) - m_K * N(d(s, r, vol) - vol * sqrt(m_T)) - s * N(-y(s, r, vol)) + m_K * exp(-r * m_T) * N(-y(s, r, vol) + vol * sqrt(m_Tc));
+}
+double chooser::payoff(const double& x) const {
+	//
+	// The payoff of a chooser option is expressed at the choosing time as the maximum of the prices of call and put.
+	// For this time dependancy we cannot use the payoff function to compute the intrinsic value of the option.
+	// Not that you want to. It would always be optimal to hold off on choosing until the choosing date to be certain you are getting the best price.
+	//
+	return std::max(vanillaEuroCall(m_K, m_T).payoff(x), vanillaEuroPut(m_K, m_T).payoff(x));
+}
+
 /***************************************** Option Derived Classes (Specific Options) *****************************************/
 
 double vanillaEuroCall::BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const {
 	return (spot * N(d_plus(spot, vol, r))) - (m_K * exp(-r * m_T) * N(d_minus(spot, vol, r)));
 }
-
 double vanillaEuroCall::deltaByBSFormula(const double& spot, const double& vol, const double& r) const {
 	return N(d_plus(spot, vol, r));
 }
-
 double vanillaEuroCall::gammaByBSFormula(const double& spot, const double& vol, const double& r) const {
 	return phi(d_plus(spot, vol, r)) / (spot * vol * sqrt(m_T));
 }
-
 double vanillaEuroCall::thetaByBSFormula(const double& spot, const double& vol, const double& r) const {
 	return -(spot * phi(d_plus(spot, vol, r)) * vol) / (2 * sqrt(m_T)) - (r * m_K * exp(-r * m_T) * N(d_minus(spot, vol, r)));
 }
@@ -250,15 +108,12 @@ double vanillaEuroCall::thetaByBSFormula(const double& spot, const double& vol, 
 double vanillaEuroPut::BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const {
 	return (m_K * exp(-r * m_T) * N(-d_minus(spot, vol, r))) - (spot * N(-d_plus(spot, vol, r)));
 }
-
 double vanillaEuroPut::deltaByBSFormula(const double& spot, const double& vol, const double& r) const {
 	return N(d_plus(spot, vol, r)) - 1;
 }
-
 double vanillaEuroPut::gammaByBSFormula(const double& spot, const double& vol, const double& r) const {
 	return phi(d_plus(spot, vol, r)) / (spot * vol * sqrt(m_T));
 }
-
 double vanillaEuroPut::thetaByBSFormula(const double& spot, const double& vol, const double& r) const {
 	return -(spot * phi(d_plus(spot, vol, r)) * vol) / (2 * sqrt(m_T)) + (r * m_K * exp(-r * m_T) * N(-d_minus(spot, vol, r)));
 }

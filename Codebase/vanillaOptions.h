@@ -1,12 +1,16 @@
 #pragma once
 #include<cmath>
-#include<algorithm>
 #include<vector>
-#include"pdf.h"
-#include"numericalIntegration.h"
-#include"rootFinding.h"
-#include"linearInterpolation.h"
 
+//
+// This is the Vanilla Options class.
+// For the purposes of this library a vanilla options is defined as: an option that is not exotic.
+// An exotic option will be defined as: an options whose payoff depends on multiple realisations of the underlying asset.
+// We see then that a vanilla option (by our definitions) is a special case of an exotic option where the payoff depends only on one instance of the underlying.
+// We have defined the options this way (rather than the usual definitions) for programmattical reasons.
+// Do not confuse a vanilla option with the vanilla payoff.
+//
+// ------------------------------------------------------------------------------------------------------------------------------
 //
 // The idea of the class structure in this file is to utilise the "Is a" relationships that exists in options.
 // For example:
@@ -20,7 +24,6 @@
 // The payoff structure classes contain methods shared across specific options with that payoff structure.
 // Generally this is methods that are used in the Analytical Formula price implementations.
 // This is also where my option specific data such as strike price is stored.
-// In these we I also specify which pricing methods can be used (if applicable to both European and American options).
 // 
 // The derived classes are the specific options you could encounter out in the wild. 
 // These classes contain only the methods that cannot be shared.
@@ -28,12 +31,12 @@
 
 /******************************************* Option Base Class (General structure) *******************************************/
 
-//
-// Black - Scholes model assumed.
-//
-
 class option {
 	friend class testing_options;
+	friend class BSPDE;
+	friend class tree;
+	friend class numInt;
+	friend class fdm;
 public:
 	enum optionType {
 		Call,
@@ -43,22 +46,21 @@ public:
 		Eu,
 		Am
 	};
-	option(const double& T, const optionType& type, const timeStruct& ts) :m_T(T), m_type(type), m_timeStruct(ts) {};
+	option(const double& T, const optionType& type, const timeStruct& ts) 
+		:m_T(T), m_type(type), m_timeStruct(ts)
+	{};
+	/*
+	option(const double& T)
+		:m_T(T), m_type(Call), m_timeStruct(Eu)
+	{};
+	*/
+	virtual double payoff(const double& spot) const = 0;
 protected:
-
-	//
-	// Pricing methods
-	//
-	double binomialPriceCRR(const double& spot, const double& vol, const double& r, const int& steps) const;
-	double binomialPriceJR(const double& spot, const double& vol, const double& r, const int& steps) const;
-	double trinomialPrice(const double& spot, const double& vol, const double& r, const int& steps, const double& lambda) const;
-	double priceByNumericalInt(const double& spot, const double& vol, const double& r, const int& steps) const;
 
 	//
 	// Polymorphic functions, defined in the payoff class when payoff class is initialised.
 	// Definition will depend of initialisation of payoff class.
 	//
-	virtual double payoff(const double& spot) const = 0;
 	virtual bool earlyExercise() const;
 	
 	//
@@ -84,10 +86,6 @@ class vanilla : public option {
 	friend class testing_options;
 public:
 	vanilla(const double& strike, const double& expiry, const optionType& type, const timeStruct& ts) : m_K(strike), option(expiry, type, ts) {};
-	using option::binomialPriceCRR;
-	using option::binomialPriceJR;
-	using option::trinomialPrice;
-	using option::priceByNumericalInt;
 	double payoff(const double& spot) const;
 protected:
 
@@ -102,14 +100,10 @@ protected:
 	//
 	const double m_K;
 };
-
 class barrier : public option {
 	friend class testing_options;
 public:
 	barrier(const double& strike, const double& expiry, const double& barrier, const optionType& type, const timeStruct& ts) : m_K(strike), m_B(barrier), option(expiry, type, ts) {};
-	using option::binomialPriceCRR;
-	using option::binomialPriceJR;
-	using option::trinomialPrice;
 	double payoff(const double& spot) const;
 protected:
 
@@ -125,6 +119,20 @@ protected:
 	//
 	const double m_K;
 	const double m_B;
+};
+class chooser : public option {
+public:
+	chooser(const double& strike, const double& expiry, const double& choose)
+		:m_K(strike), m_Tc(choose), option(expiry, Call, Eu)
+	{};
+	double price(const double& s, const double& vol, const double& r) const;
+	double payoff(const double& x) const;
+private:
+	const double m_K;
+	const double m_Tc;
+
+	double d(const double& s, const double& r, const double& vol) const;
+	double y(const double& s, const double& r, const double& vol) const;
 };
 
 /***************************************** Option Derived Classes (Specific Options) *****************************************/
@@ -146,7 +154,6 @@ public:
 	double gammaByBSFormula(const double& spot, const double& vol, const double& r) const;
 	double thetaByBSFormula(const double& spot, const double& vol, const double& r) const;
 };
-
 class vanillaEuroPut : public vanilla {
 public:
 	vanillaEuroPut(const double& strike, const double& expiry) :vanilla(strike, expiry, Put, Eu) {};
@@ -156,12 +163,10 @@ public:
 	double gammaByBSFormula(const double& spot, const double& vol, const double& r) const;
 	double thetaByBSFormula(const double& spot, const double& vol, const double& r) const;
 };
-
 class vanillaAmCall : public vanilla {
 public:
 	vanillaAmCall(const double& strike, const double& expiry) :vanilla(strike, expiry, Call, Am) {};
 };
-
 class vanillaAmPut : public vanilla {
 public:
 	vanillaAmPut(const double& strike, const double& expiry) :vanilla(strike, expiry, Put, Am) {};
@@ -171,6 +176,6 @@ public:
 
 class UpAndOutEuroCall : public barrier {
 public:
-	UpAndOutEuroCall(const double& strike, const double& expiry, const double& barrier) :barrier(strike, expiry, barrier, Call, Eu){};
+	UpAndOutEuroCall(const double& strike, const double& expiry, const double& barrier) :barrier(strike, expiry, barrier, Call, Eu) {};
 	double BSAnalyticalPrice(const double& spot, const double& vol, const double& r) const;
 };

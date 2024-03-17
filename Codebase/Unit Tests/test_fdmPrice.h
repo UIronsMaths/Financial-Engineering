@@ -1,11 +1,11 @@
 #pragma once
-#include<cassert>
 #include<iostream>
-#include"../vanillaOptions.h"
+#include<cassert>
+#include"../priceByFDM.h"
 
-class testing_options {
+class testing_fdmPrice {
 public:
-	void testOptions();
+	void testFDMPrice();
 private:
 	void testVanilla();
 	void testBarrier();
