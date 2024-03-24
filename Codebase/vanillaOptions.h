@@ -54,6 +54,7 @@ public:
 		:m_T(T), m_type(Call), m_timeStruct(Eu)
 	{};
 	*/
+	const double m_T;
 	virtual double payoff(const double& spot) const = 0;
 protected:
 
@@ -75,7 +76,6 @@ protected:
 	//
 	double N(const double& x) const;
 	double phi(const double& x) const;
-	const double m_T;
 	const optionType m_type;
 	const timeStruct m_timeStruct;
 };

@@ -26,7 +26,7 @@ double explicitMethod::solvePDE(const BSPDE* pde, const double& X0) const
 	}
 
 	//
-	// Moving over t axis. This will be dependant on whether the Boundary consition on t is at 0 or T.
+	// Moving over t axis. This will be dependant on whether the Boundary condition on t is at 0 or T.
 	// If T, we need to move backwards in time. Our explicit scheme will be constructed using backward difference approximations.
 	// If 0, we are moving forwards in time. Our explicit scheme will be constructed using forward difference approximations.
 	//
